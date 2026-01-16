@@ -273,6 +273,43 @@ router.post('/appointments/doctors', authenticate, appointment.createAppointment
 
 /**
  * @swagger
+ * /appointments/auto-assign:
+ *   post:
+ *     summary: 2.12. Đặt Lịch Tự Động (Không Cần Chọn Bác Sĩ)
+ *     description: Hệ thống sẽ tự động chọn bác sĩ có lịch làm việc, có slot trống và ít lịch hẹn nhất
+ *     tags: [Appointments]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - appointmentDate
+ *             properties:
+ *               appointmentDate:
+ *                 type: string
+ *                 format: date-time
+ *                 example: 2024-12-17T09:00:00.000Z
+ *                 description: Thời gian khám mong muốn
+ *               note:
+ *                 type: string
+ *                 description: Ghi chú (optional)
+ *               patientId:
+ *                 type: string
+ *                 description: ID bệnh nhân (chỉ dành cho staff/admin)
+ *     responses:
+ *       200:
+ *         description: Đặt lịch thành công, hệ thống đã tự động chọn bác sĩ
+ *       404:
+ *         description: Không tìm thấy bác sĩ phù hợp hoặc không có slot trống
+ */
+router.post('/appointments/auto-assign', authenticate, appointment.createAppointmentAutoAssign);
+
+/**
+ * @swagger
  * /appointments/{id}:
  *   put:
  *     summary: Cập Nhật Lịch Hẹn

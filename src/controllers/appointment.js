@@ -162,6 +162,50 @@ async function createAppointmentByDoctor(req, res) {
     }
 }
 
+// tạo appointment tự động (không cần chọn bác sĩ)
+async function createAppointmentAutoAssign(req, res) {
+    const { appointmentDate, note } = req.body;
+
+    if (!appointmentDate) {
+        return res.status(400).json({ status: false, message: 'appointmentDate là bắt buộc' });
+    }
+
+    let patientId;
+
+    // Nếu là patient tự đặt, cần tìm Patient record từ userId
+    if (req.user.role === 'patient') {
+        const patient = await Patient.findOne({ userId: req.user._id });
+        if (!patient) {
+            return res.status(404).json({ status: false, message: 'Không tìm thấy thông tin bệnh nhân' });
+        }
+        patientId = patient._id;
+    } else {
+        // Nếu là staff/admin đặt cho bệnh nhân, lấy patientId từ body
+        patientId = req.body.patientId;
+    }
+
+    if (!patientId) return res.status(400).json({ status: false, message: 'patientId là bắt buộc' });
+
+    try {
+        // Không truyền doctorId, để hệ thống tự động chọn
+        const result = await appointmentService.createAppointmentForDoctor({
+            patientId,
+            doctorId: null, // Tự động chọn bác sĩ
+            appointmentDate,
+            note,
+            createdByRole: req.user.role
+        });
+        if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
+        return res.json({ 
+            status: true, 
+            data: result.data,
+            message: 'Đặt lịch thành công! Hệ thống đã tự động chọn bác sĩ phù hợp cho bạn.'
+        });
+    } catch (error) {
+        return res.status(500).json({ status: false, message: error.message });
+    }
+}
+
 
 // --- Helper function ---
 async function listDoctorAppointments(currentUser, query) {
@@ -212,6 +256,7 @@ module.exports = {
     getAvailableDatesByDoctor,
     getAvailableSlotsByDoctorAndDate,
     createAppointmentByDoctor,
+    createAppointmentAutoAssign,
     updateAppointment,
     deleteAppointment
 };
