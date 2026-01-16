@@ -1,17 +1,17 @@
-const router = require('express').Router();
-const testRequestController = require('../controllers/testRequest');
-const { authenticate } = require('../middleware/auth');
+const router = require("express").Router();
+const testRequestController = require("../controllers/testRequest");
+const { authenticate } = require("../middleware/auth");
 
 // Tất cả các route test request đều yêu cầu xác thực
-router.use('/api/test-requests', authenticate);
+router.use("/api/test-requests", authenticate);
 
 /**
  * @swagger
  * tags:
- *   name: TestRequests
- *   description: API yêu cầu xét nghiệm
- *   name: TestResults
- *   description: API kết quả xét nghiệm
+ *   - name: TestRequests
+ *     description: API yêu cầu xét nghiệm
+ *   - name: TestResults
+ *     description: API kết quả xét nghiệm
  */
 
 /**
@@ -68,8 +68,8 @@ router.use('/api/test-requests', authenticate);
  *       200:
  *         description: Danh sách yêu cầu
  */
-router.post('/api/test-requests', testRequestController.createTestRequest);
-router.get('/api/test-requests', testRequestController.listTestRequests);
+router.post("/api/test-requests", testRequestController.createTestRequest);
+router.get("/api/test-requests", testRequestController.listTestRequests);
 
 /**
  * @swagger
@@ -89,7 +89,7 @@ router.get('/api/test-requests', testRequestController.listTestRequests);
  *       200:
  *         description: Chi tiết yêu cầu
  */
-router.get('/api/test-requests/:id', testRequestController.getTestRequest);
+router.get("/api/test-requests/:id", testRequestController.getTestRequest);
 
 /**
  * @swagger
@@ -121,7 +121,7 @@ router.get('/api/test-requests/:id', testRequestController.getTestRequest);
  *       200:
  *         description: Cập nhật thành công
  */
-router.put('/api/test-requests/:id/status', testRequestController.updateStatus);
+router.put("/api/test-requests/:id/status", testRequestController.updateStatus);
 
 /**
  * @swagger
@@ -141,10 +141,13 @@ router.put('/api/test-requests/:id/status', testRequestController.updateStatus);
  *       200:
  *         description: Danh sách yêu cầu theo ca khám
  */
-router.get('/api/examinations/:examId/test-requests', testRequestController.getTestRequestsByExam);
+router.get(
+  "/api/examinations/:examId/test-requests",
+  testRequestController.getTestRequestsByExam
+);
 
 // ===== TEST RESULTS ROUTES =====
-const { authorize } = require('../middleware/auth');
+const { authorize } = require("../middleware/auth");
 
 /**
  * @swagger
@@ -183,10 +186,10 @@ const { authorize } = require('../middleware/auth');
  */
 
 router.post(
-    '/test-results',
-    authenticate,
-    authorize(['labNurse']),
-    testRequestController.createTestResult
+  "/test-results",
+  authenticate,
+  authorize(["labNurse"]),
+  testRequestController.createTestResult
 );
 
 /**
@@ -208,9 +211,9 @@ router.post(
  *         description: Chi tiết kết quả
  */
 router.get(
-    '/test-results/:testRequestId',
-    authenticate,
-    testRequestController.getTestResult
+  "/test-results/:testRequestId",
+  authenticate,
+  testRequestController.getTestResult
 );
 
 /**
@@ -240,10 +243,10 @@ router.get(
  *         description: Cập nhật thành công
  */
 router.put(
-    '/test-results/:id',
-    authenticate,
-    authorize(['labNurse']),
-    testRequestController.updateTestResult
+  "/test-results/:id",
+  authenticate,
+  authorize(["labNurse"]),
+  testRequestController.updateTestResult
 );
 
 /**
@@ -265,10 +268,10 @@ router.put(
  *         description: Danh sách kết quả
  */
 router.get(
-    '/test-results/examination/:examId',
-    authenticate,
-    authorize(['doctor', 'labNurse', 'staff', 'admin']),
-    testRequestController.getExaminationResults
+  "/test-results/examination/:examId",
+  authenticate,
+  authorize(["doctor", "labNurse", "staff", "admin"]),
+  testRequestController.getExaminationResults
 );
 
 /**
@@ -290,9 +293,9 @@ router.get(
  *         description: Lịch sử xét nghiệm
  */
 router.get(
-    '/test-results/patient/:patientId',
-    authenticate,
-    testRequestController.getPatientTestHistory
+  "/test-results/patient/:patientId",
+  authenticate,
+  testRequestController.getPatientTestHistory
 );
 
 /**
@@ -339,8 +342,17 @@ router.get(
  *       200:
  *         description: Xóa thành công
  */
-router.put('/api/test-requests/:id', authenticate, authorize(['doctor', 'labNurse', 'admin']), testRequestController.updateTestRequest);
-router.delete('/api/test-requests/:id', authenticate, authorize(['doctor', 'admin']), testRequestController.deleteTestRequest);
+router.put(
+  "/api/test-requests/:id",
+  authenticate,
+  authorize(["doctor", "labNurse", "admin"]),
+  testRequestController.updateTestRequest
+);
+router.delete(
+  "/api/test-requests/:id",
+  authenticate,
+  authorize(["doctor", "admin"]),
+  testRequestController.deleteTestRequest
+);
 
 module.exports = router;
-
