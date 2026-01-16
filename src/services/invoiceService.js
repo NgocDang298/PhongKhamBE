@@ -27,6 +27,11 @@ async function createInvoice({ examinationId, items }) {
     let totalAmount = 0;
 
     for (const item of items) {
+        // Validate referenceId
+        if (!item.referenceId || item.referenceId.trim() === '') {
+            return { ok: false, code: 400, message: 'referenceId là bắt buộc cho mỗi item' };
+        }
+
         // Lấy thông tin service
         const service = await Service.findById(item.referenceId).lean();
         if (!service || !service.isActive) {
@@ -329,6 +334,11 @@ async function updateInvoice(invoiceId, updates) {
         // Recalculate total amount
         let totalAmount = 0;
         for (const item of updates.items) {
+            // Validate referenceId
+            if (!item.referenceId || item.referenceId.trim() === '') {
+                return { ok: false, code: 400, message: 'referenceId là bắt buộc cho mỗi item' };
+            }
+
             const service = await Service.findById(item.referenceId).lean();
             if (service) {
                 totalAmount += service.price * (item.quantity || 1);
