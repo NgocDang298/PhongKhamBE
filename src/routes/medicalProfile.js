@@ -51,6 +51,17 @@ const medicalProfile = require('../controllers/medicalProfile');
  *     responses:
  *       200:
  *         description: Chi tiết hồ sơ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
  */
 router.post('/medical-profile', authenticate, authorize(['patient']), medicalProfile.createOrGet);
 
@@ -102,6 +113,17 @@ router.post('/medical-profile', authenticate, authorize(['patient']), medicalPro
  *     responses:
  *       200:
  *         description: Chi tiết hồ sơ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
  */
 router.post('/patients/:patientId/medical-profile', authenticate, authorize(['staff', 'admin']), medicalProfile.createOrGetForPatient);
 

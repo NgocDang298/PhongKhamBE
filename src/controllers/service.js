@@ -47,6 +47,7 @@ async function getService(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy thông tin dịch vụ thành công',
         data: result.data
     });
 }
@@ -76,6 +77,7 @@ async function listServices(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy danh sách dịch vụ thành công',
         data: result.data
     });
 }
@@ -146,6 +148,7 @@ async function getActiveServices(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy danh sách dịch vụ đang hoạt động thành công',
         data: result.data
     });
 }

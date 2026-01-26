@@ -20,6 +20,7 @@ async function getMyProfile(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy thông tin cá nhân thành công',
         data: result.data
     });
 }
@@ -99,6 +100,7 @@ async function getMedicalHistory(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy lịch sử khám bệnh thành công',
         data: result.data
     });
 }
@@ -127,6 +129,7 @@ async function getMyAppointments(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy danh sách lịch hẹn thành công',
         data: result.data
     });
 }
@@ -175,6 +178,7 @@ async function getMyExaminations(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy danh sách ca khám thành công',
         data: result.data
     });
 }

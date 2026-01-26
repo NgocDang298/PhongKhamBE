@@ -14,7 +14,7 @@ async function create(req, res) {
         return res.status(403).json({ status: false, message: 'Không có quyền tạo lịch hẹn' });
     }
     if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
-    return res.json({ status: true, data: result.data });
+    return res.json({ status: true, message: result.message || 'Tạo lịch hẹn thành công', data: result.data });
 }
 
 // --- LIST ---
@@ -30,7 +30,7 @@ async function list(req, res) {
         return res.status(403).json({ status: false, message: 'Không có quyền xem lịch hẹn' });
     }
     if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
-    return res.json({ status: true, data: result.data });
+    return res.json({ status: true, message: result.message || 'Lấy danh sách lịch hẹn thành công', data: result.data });
 }
 
 // --- GET SLOTS ---
@@ -39,7 +39,7 @@ async function getSlots(req, res) {
     if (!date) return res.status(400).json({ status: false, message: 'date là bắt buộc' });
     try {
         const slots = await appointmentService.getAvailableSlots(doctorId, date);
-        return res.json({ status: true, data: slots });
+        return res.json({ status: true, message: 'Lấy danh sách slot trống thành công', data: slots });
     } catch (error) {
         return res.status(500).json({ status: false, message: error.message });
     }
@@ -83,7 +83,7 @@ async function getSuggestedSlots(req, res) {
     const { limit } = req.query || {};
     try {
         const suggestedSlots = await require('../services/appointmentService').getSuggestedSlots(id, limit ? parseInt(limit) : 5);
-        return res.json({ status: true, data: suggestedSlots });
+        return res.json({ status: true, message: 'Lấy gợi ý lịch hẹn thành công', data: suggestedSlots });
     } catch (error) {
         return res.status(500).json({ status: false, message: error.message });
     }
@@ -94,7 +94,7 @@ async function getSuggestedSlots(req, res) {
 async function listDoctors(req, res) {
     try {
         const doctors = await appointmentService.listActiveDoctors();
-        return res.json({ status: true, data: doctors });
+        return res.json({ status: true, message: 'Lấy danh sách bác sĩ thành công', data: doctors });
     } catch (error) {
         return res.status(500).json({ status: false, message: error.message });
     }
@@ -106,7 +106,7 @@ async function getAvailableDatesByDoctor(req, res) {
     if (!doctorId) return res.status(400).json({ status: false, message: 'doctorId là bắt buộc' });
     try {
         const dates = await appointmentService.getAvailableDatesByDoctor(doctorId);
-        return res.json({ status: true, data: dates });
+        return res.json({ status: true, message: 'Lấy danh sách ngày trống thành công', data: dates });
     } catch (error) {
         return res.status(500).json({ status: false, message: error.message });
     }
@@ -118,7 +118,7 @@ async function getAvailableSlotsByDoctorAndDate(req, res) {
     if (!doctorId || !date) return res.status(400).json({ status: false, message: 'doctorId và date là bắt buộc' });
     try {
         const slots = await appointmentService.getAvailableSlotsByDoctorAndDate(doctorId, date);
-        return res.json({ status: true, data: slots });
+        return res.json({ status: true, message: 'Lấy danh sách slot trống thành công', data: slots });
     } catch (error) {
         return res.status(500).json({ status: false, message: error.message });
     }
@@ -156,7 +156,7 @@ async function createAppointmentByDoctor(req, res) {
             createdByRole: req.user.role
         });
         if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
-        return res.json({ status: true, data: result.data });
+        return res.json({ status: true, message: result.message || 'Đặt lịch hẹn thành công', data: result.data });
     } catch (error) {
         return res.status(500).json({ status: false, message: error.message });
     }
@@ -196,8 +196,8 @@ async function createAppointmentAutoAssign(req, res) {
             createdByRole: req.user.role
         });
         if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
-        return res.json({ 
-            status: true, 
+        return res.json({
+            status: true,
             data: result.data,
             message: 'Đặt lịch thành công! Hệ thống đã tự động chọn bác sĩ phù hợp cho bạn.'
         });

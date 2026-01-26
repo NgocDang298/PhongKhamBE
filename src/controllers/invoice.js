@@ -63,6 +63,7 @@ async function getInvoice(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy thông tin hóa đơn thành công',
         data: result.data
     });
 }
@@ -93,6 +94,7 @@ async function listInvoices(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy danh sách hóa đơn thành công',
         data: result.data
     });
 }
@@ -155,6 +157,7 @@ async function getPatientInvoices(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy danh sách hóa đơn của bệnh nhân thành công',
         data: result.data
     });
 }
@@ -182,6 +185,7 @@ async function getStatistics(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy thống kê doanh thu thành công',
         data: result.data
     });
 }

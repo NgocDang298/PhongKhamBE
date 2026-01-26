@@ -21,6 +21,7 @@ async function getAllAccounts(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy danh sách tài khoản thành công',
         data: result.data
     });
 }
@@ -43,6 +44,7 @@ async function getAccountById(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy thông tin tài khoản thành công',
         data: result.data
     });
 }

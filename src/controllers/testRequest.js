@@ -56,6 +56,7 @@ async function getTestRequestsByExam(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy danh sách yêu cầu xét nghiệm thành công',
         data: result.data
     });
 }
@@ -78,6 +79,7 @@ async function getTestRequest(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy thông tin yêu cầu xét nghiệm thành công',
         data: result.data
     });
 }
@@ -141,6 +143,7 @@ async function listTestRequests(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy danh sách yêu cầu xét nghiệm thành công',
         data: result.data
     });
 }
@@ -200,6 +203,7 @@ async function getTestResult(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy kết quả xét nghiệm thành công',
         data: result.data
     });
 }
@@ -254,6 +258,7 @@ async function getExaminationResults(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy danh sách kết quả xét nghiệm của ca khám thành công',
         data: result.data
     });
 }
@@ -283,6 +288,7 @@ async function getPatientTestHistory(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy lịch sử xét nghiệm của bệnh nhân thành công',
         data: result.data
     });
 }

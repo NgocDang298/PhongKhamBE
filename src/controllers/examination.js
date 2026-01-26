@@ -54,6 +54,7 @@ async function getExam(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy thông tin ca khám thành công',
         data: result.data
     });
 }
@@ -76,6 +77,7 @@ async function getExamByAppointment(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy thông tin ca khám thành công',
         data: result.data
     });
 }
@@ -107,6 +109,7 @@ async function listExams(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy danh sách ca khám thành công',
         data: result.data
     });
 }

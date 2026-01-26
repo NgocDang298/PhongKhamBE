@@ -30,7 +30,7 @@ module.exports = {
 
         const result = await authService.register(req.body || {});
         if (!result.ok) return res.status(result.code).json({ status: false, message: result.message });
-        return res.json({ status: true, data: result.data });
+        return res.json({ status: true, message: result.message || 'Đăng ký tài khoản thành công', data: result.data });
     },
 
     /**
@@ -42,7 +42,7 @@ module.exports = {
     async registerPatient(req, res) {
         const result = await authService.registerPatient(req.body || {});
         if (!result.ok) return res.status(result.code).json({ status: false, message: result.message });
-        return res.json({ status: true, data: result.data });
+        return res.json({ status: true, message: result.message || 'Đăng ký tài khoản bệnh nhân thành công', data: result.data });
     },
 
     /**
@@ -55,7 +55,7 @@ module.exports = {
     async registerAdmin(req, res) {
         const result = await authService.registerAdmin(req.body || {});
         if (!result.ok) return res.status(result.code).json({ status: false, message: result.message });
-        return res.json({ status: true, data: result.data });
+        return res.json({ status: true, message: result.message || 'Đăng ký tài khoản admin thành công', data: result.data });
     },
 
 

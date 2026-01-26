@@ -12,7 +12,7 @@ module.exports = {
     async createOrGet(req, res) {
         const result = await medicalProfileService.createOrGetMedicalProfile(req.user, req.body || {});
         if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
-        return res.status(result.code || 200).json({ status: true, data: result.data });
+        return res.status(result.code || 200).json({ status: true, message: result.message, data: result.data });
     },
 
     /**
@@ -26,7 +26,7 @@ module.exports = {
             req.body || {}
         );
         if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
-        return res.status(result.code || 200).json({ status: true, data: result.data });
+        return res.status(result.code || 200).json({ status: true, message: result.message, data: result.data });
     },
 
     /**

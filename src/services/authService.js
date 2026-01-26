@@ -745,7 +745,8 @@ module.exports = {
                         _id: user._id,
                         cccd: user.cccd,
                         role: user.role,
-                    }
+                    },
+                    message: "Đăng nhập thành công"
                 }
             };
         } catch (error) {

@@ -21,7 +21,7 @@ module.exports = {
     async getByRequestId(req, res) {
         const result = await testResultService.getTestResultByRequestId(req.params.testRequestId);
         if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
-        return res.json({ status: true, data: result.data });
+        return res.json({ status: true, message: result.message || 'Lấy kết quả xét nghiệm thành công', data: result.data });
     },
 
     /**
@@ -39,7 +39,7 @@ module.exports = {
     async getByExamination(req, res) {
         const result = await testResultService.getExaminationTestResults(req.params.examId);
         if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
-        return res.json({ status: true, data: result.data });
+        return res.json({ status: true, message: result.message || 'Lấy kết quả xét nghiệm của ca khám thành công', data: result.data });
     },
 
     /**
@@ -48,7 +48,7 @@ module.exports = {
     async getPatientHistory(req, res) {
         const result = await testResultService.getPatientTestHistory(req.params.patientId, req.query);
         if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
-        return res.json({ status: true, data: result.data });
+        return res.json({ status: true, message: result.message || 'Lấy lịch sử xét nghiệm của bệnh nhân thành công', data: result.data });
     },
 
     /**

@@ -20,7 +20,7 @@ module.exports = {
     async listPatients(req, res) {
         const result = await staffService.listAllPatients(req.user, req.query || {});
         if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
-        return res.json({ status: true, data: result.data });
+        return res.json({ status: true, message: result.message || 'Lấy danh sách bệnh nhân thành công', data: result.data });
     },
 
     /**
@@ -30,7 +30,7 @@ module.exports = {
         const doctors = await Doctor.find({})
             .populate('userId', '-password -tokens')
             .lean();
-        return res.json({ status: true, data: doctors });
+        return res.json({ status: true, message: 'Lấy danh sách bác sĩ thành công', data: doctors });
     },
 
     /**
@@ -40,7 +40,7 @@ module.exports = {
         const staffs = await Staff.find({})
             .populate('userId', '-password -tokens')
             .lean();
-        return res.json({ status: true, data: staffs });
+        return res.json({ status: true, message: 'Lấy danh sách nhân viên thành công', data: staffs });
     },
 
     /**
@@ -50,7 +50,7 @@ module.exports = {
         const nurses = await LabNurse.find({})
             .populate('userId', '-password -tokens')
             .lean();
-        return res.json({ status: true, data: nurses });
+        return res.json({ status: true, message: 'Lấy danh sách y tá thành công', data: nurses });
     },
 
     /**

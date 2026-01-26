@@ -13,7 +13,7 @@ async function createOrGetMedicalProfile(user, payload) {
 
         let profile = await MedicalProfile.findOne({ patientId: patient._id });
         if (profile) {
-            return { ok: true, data: profile };
+            return { ok: true, data: profile, message: 'Lấy thông tin hồ sơ y tế thành công' };
         }
 
         profile = await MedicalProfile.create({
@@ -27,12 +27,12 @@ async function createOrGetMedicalProfile(user, payload) {
             notes: payload && payload.notes
         });
 
-        return { ok: true, code: 201, data: profile };
+        return { ok: true, code: 201, data: profile, message: 'Tạo hồ sơ y tế thành công' };
     } catch (err) {
         if (err && err.code === 11000) {
             const patient = await Patient.findOne({ userId: user._id }, '_id');
             const profile = await MedicalProfile.findOne({ patientId: patient._id });
-            if (profile) return { ok: true, data: profile };
+            if (profile) return { ok: true, data: profile, message: 'Lấy thông tin hồ sơ y tế thành công' };
         }
         return { ok: false, code: 500, message: 'Internal server error' };
     }
@@ -55,7 +55,7 @@ async function createOrGetMedicalProfileForPatient(actorUser, targetPatientId, p
 
         let profile = await MedicalProfile.findOne({ patientId: patient._id });
         if (profile) {
-            return { ok: true, data: profile };
+            return { ok: true, data: profile, message: 'Lấy thông tin hồ sơ y tế thành công' };
         }
 
         profile = await MedicalProfile.create({
@@ -69,11 +69,11 @@ async function createOrGetMedicalProfileForPatient(actorUser, targetPatientId, p
             notes: payload && payload.notes
         });
 
-        return { ok: true, code: 201, data: profile };
+        return { ok: true, code: 201, data: profile, message: 'Tạo hồ sơ y tế thành công' };
     } catch (err) {
         if (err && err.code === 11000) {
             const profile = await MedicalProfile.findOne({ patientId: targetPatientId });
-            if (profile) return { ok: true, data: profile };
+            if (profile) return { ok: true, data: profile, message: 'Lấy thông tin hồ sơ y tế thành công' };
         }
         return { ok: false, code: 500, message: 'Internal server error' };
     }

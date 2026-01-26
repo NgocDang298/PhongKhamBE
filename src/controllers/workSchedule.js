@@ -57,6 +57,7 @@ async function getDoctorSchedule(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy lịch làm việc của bác sĩ thành công',
         data: result.data
     });
 }
@@ -79,6 +80,7 @@ async function getNurseSchedule(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Lấy lịch làm việc của y tá thành công',
         data: result.data
     });
 }
@@ -160,6 +162,7 @@ async function findAvailableStaff(req, res) {
 
     return res.json({
         status: true,
+        message: result.message || 'Tìm nhân viên trực thành công',
         data: result.data
     });
 }

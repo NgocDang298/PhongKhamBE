@@ -136,6 +136,9 @@ router.post('/auth/register/admin', auth.registerAdmin); // Tạo admin (WARNING
  *                   type: string
  *                 user:
  *                   type: object
+ *                 message:
+ *                   type: string
+ *                   example: "Đăng nhập thành công"
  */
 router.post('/auth/login', auth.login);
 
