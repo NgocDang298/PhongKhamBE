@@ -5,7 +5,7 @@ const { TestResult, TestRequest, Examination, LabNurse, Patient } = require('../
  * @param {Object} params - { testRequestId, labNurseId, resultData }
  * @returns {Object} - { ok, data, message, code }
  */
-async function createTestResult({ testRequestId, labNurseId, resultData }) {
+async function createTestResult({ testRequestId, labNurseId, resultData, images }) {
     // Kiểm tra test request tồn tại
     const testRequest = await TestRequest.findById(testRequestId)
         .populate('examId')
@@ -41,6 +41,7 @@ async function createTestResult({ testRequestId, labNurseId, resultData }) {
         testRequestId,
         labNurseId,
         resultData,
+        images: Array.isArray(images) ? images : [],
         performedAt: new Date()
     });
 
@@ -111,10 +112,10 @@ async function getTestResultByRequestId(testRequestId) {
 /**
  * Cập nhật kết quả xét nghiệm
  * @param {String} testResultId
- * @param {Object} resultData
+ * @param {Object} data - { resultData, images }
  * @returns {Object} - { ok, data, message, code }
  */
-async function updateTestResult(testResultId, resultData) {
+async function updateTestResult(testResultId, { resultData, images }) {
     const testResult = await TestResult.findById(testResultId);
 
     if (!testResult) {
@@ -122,7 +123,9 @@ async function updateTestResult(testResultId, resultData) {
     }
 
     // Cập nhật resultData
-    testResult.resultData = resultData;
+    if (resultData !== undefined) testResult.resultData = resultData;
+    if (images !== undefined && Array.isArray(images)) testResult.images = images;
+
     testResult.performedAt = new Date();
     await testResult.save();
 

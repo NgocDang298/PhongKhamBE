@@ -17,6 +17,9 @@ const TestResultSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.Mixed,
         required: true
     },
+    images: [{
+        type: String // URLs from Cloudinary
+    }],
     performedAt: {
         type: Date,
         required: true

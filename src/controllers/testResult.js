@@ -6,10 +6,15 @@ module.exports = {
      */
     async create(req, res) {
         const { testRequestId, resultData } = req.body;
+
+        // Lấy URLs từ Cloudinary (nếu có upload file)
+        const images = req.files ? req.files.map(file => file.path) : [];
+
         const result = await testResultService.createTestResult({
             testRequestId,
             labNurseId: req.user.labNurseId || req.user._id,
-            resultData
+            resultData: typeof resultData === 'string' ? JSON.parse(resultData) : resultData,
+            images
         });
         if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
         return res.status(201).json({ status: true, message: result.message, data: result.data });
@@ -28,7 +33,13 @@ module.exports = {
      * PUT /test-results/:id - Cập nhật kết quả xét nghiệm
      */
     async update(req, res) {
-        const result = await testResultService.updateTestResult(req.params.id, req.body.resultData);
+        const { resultData } = req.body;
+        const images = req.files ? req.files.map(file => file.path) : undefined;
+
+        const result = await testResultService.updateTestResult(req.params.id, {
+            resultData: resultData ? (typeof resultData === 'string' ? JSON.parse(resultData) : resultData) : undefined,
+            images
+        });
         if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
         return res.json({ status: true, message: result.message, data: result.data });
     },
