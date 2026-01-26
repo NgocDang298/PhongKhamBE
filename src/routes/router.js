@@ -36,4 +36,7 @@ router.use(require('./profile'));
 // Các route quản lý tài khoản
 router.use(require('./account'));
 
+// Route upload file
+router.use(require('./upload'));
+
 module.exports = router;

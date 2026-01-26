@@ -188,7 +188,7 @@ const { authorize } = require("../middleware/auth");
 router.post(
   "/test-results",
   authenticate,
-  authorize(["labNurse"]),
+  authorize(["lab_nurse"]),
   testRequestController.createTestResult
 );
 
@@ -245,7 +245,7 @@ router.get(
 router.put(
   "/test-results/:id",
   authenticate,
-  authorize(["labNurse"]),
+  authorize(["lab_nurse"]),
   testRequestController.updateTestResult
 );
 
@@ -270,7 +270,7 @@ router.put(
 router.get(
   "/test-results/examination/:examId",
   authenticate,
-  authorize(["doctor", "labNurse", "staff", "admin"]),
+  authorize(["doctor", "lab_nurse", "staff", "admin"]),
   testRequestController.getExaminationResults
 );
 
@@ -345,7 +345,7 @@ router.get(
 router.put(
   "/api/test-requests/:id",
   authenticate,
-  authorize(["doctor", "labNurse", "admin"]),
+  authorize(["doctor", "lab_nurse", "admin"]),
   testRequestController.updateTestRequest
 );
 router.delete(

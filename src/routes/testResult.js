@@ -36,7 +36,7 @@ const upload = require('../middleware/upload');
  *       201:
  *         description: Tạo thành công
  */
-router.post('/test-results', authenticate, authorize(['labNurse', 'admin']), upload.array('images', 5), testResult.create);
+router.post('/test-results', authenticate, authorize(['lab_nurse', 'admin']), upload.array('images', 5), testResult.create);
 
 /**
  * @swagger
@@ -157,8 +157,8 @@ router.get('/test-results/:testRequestId', authenticate, testResult.getByRequest
  *       200:
  *         description: Xóa thành công
  */
-router.put('/test-results/:id', authenticate, authorize(['labNurse', 'admin']), upload.array('images', 5), testResult.update);
-router.delete('/test-results/:id', authenticate, authorize(['labNurse', 'admin']), testResult.delete);
+router.put('/test-results/:id', authenticate, authorize(['lab_nurse', 'admin']), upload.array('images', 5), testResult.update);
+router.delete('/test-results/:id', authenticate, authorize(['lab_nurse', 'admin']), testResult.delete);
 
 
 
