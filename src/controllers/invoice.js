@@ -9,10 +9,10 @@ async function createInvoice(req, res) {
     const { examinationId, items } = req.body;
 
     // Validate required fields
-    if (!examinationId || !items || !Array.isArray(items) || items.length === 0) {
+    if (!examinationId) {
         return res.status(400).json({
             status: false,
-            message: 'examinationId và items (array) là bắt buộc'
+            message: 'examinationId là bắt buộc'
         });
     }
 

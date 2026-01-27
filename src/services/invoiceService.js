@@ -6,7 +6,7 @@ const { Invoice, Examination, TestRequest, Service, Patient } = require('../mode
  * @returns {Object} - { ok, data, message, code }
  */
 async function createInvoice({ examinationId, items }) {
-    // Kiểm tra examination tồn tại
+    // 1. Kiểm tra examination tồn tại
     const examination = await Examination.findById(examinationId)
         .populate('patientId')
         .populate('serviceId')
@@ -16,43 +16,75 @@ async function createInvoice({ examinationId, items }) {
         return { ok: false, code: 404, message: 'Không tìm thấy ca khám' };
     }
 
-    // Kiểm tra đã có hóa đơn chưa
+    // 2. Kiểm tra đã có hóa đơn chưa
     const existingInvoice = await Invoice.findOne({ examinationId }).lean();
     if (existingInvoice) {
-        return { ok: false, code: 400, message: 'Ca khám đã có hóa đơn' };
+        return { ok: false, code: 400, message: 'Ca khám này đã được lập hóa đơn trước đó' };
     }
 
-    // Xử lý items
     const invoiceItems = [];
     let totalAmount = 0;
 
-    for (const item of items) {
-        // Validate referenceId
-        if (!item.referenceId || item.referenceId.trim() === '') {
-            return { ok: false, code: 400, message: 'referenceId là bắt buộc cho mỗi item' };
+    // 3. Nếu items không được truyền vào, tự động lấy từ ca khám và xét nghiệm
+    if (!items || !Array.isArray(items) || items.length === 0) {
+        // a. Lấy dịch vụ khám chính
+        if (examination.serviceId) {
+            const mainService = await Service.findById(examination.serviceId).lean();
+            if (mainService) {
+                invoiceItems.push({
+                    type: 'service',
+                    referenceId: mainService._id,
+                    name: mainService.name,
+                    price: mainService.price,
+                    quantity: 1
+                });
+                totalAmount += mainService.price;
+            }
         }
 
-        // Lấy thông tin service
-        const service = await Service.findById(item.referenceId).lean();
-        if (!service || !service.isActive) {
-            return { ok: false, code: 404, message: `Không tìm thấy dịch vụ: ${item.referenceId}` };
+        // b. Lấy tất cả xét nghiệm đã hoàn thành của ca khám này
+        const testRequests = await TestRequest.find({
+            examId: examinationId,
+            status: 'completed'
+        }).populate('serviceId').lean();
+
+        for (const tr of testRequests) {
+            if (tr.serviceId) {
+                invoiceItems.push({
+                    type: 'test',
+                    referenceId: tr.serviceId._id,
+                    name: tr.serviceId.name,
+                    price: tr.serviceId.price,
+                    quantity: 1
+                });
+                totalAmount += tr.serviceId.price;
+            }
         }
 
-        const quantity = item.quantity || 1;
-        const itemTotal = service.price * quantity;
+        if (invoiceItems.length === 0) {
+            return { ok: false, code: 400, message: 'Ca khám này không có dịch vụ nào để lập hóa đơn' };
+        }
+    } else {
+        // 4. Nếu có truyền items thủ công (giữ lại logic cũ để linh hoạt)
+        for (const item of items) {
+            const service = await Service.findById(item.referenceId).lean();
+            if (!service || !service.isActive) {
+                return { ok: false, code: 404, message: `Không tìm thấy dịch vụ: ${item.referenceId}` };
+            }
 
-        invoiceItems.push({
-            type: item.type,
-            referenceId: item.referenceId,
-            name: service.name,
-            price: service.price,
-            quantity
-        });
-
-        totalAmount += itemTotal;
+            const quantity = item.quantity || 1;
+            invoiceItems.push({
+                type: item.type || 'service',
+                referenceId: item.referenceId,
+                name: service.name,
+                price: service.price,
+                quantity
+            });
+            totalAmount += service.price * quantity;
+        }
     }
 
-    // Tạo hóa đơn
+    // 5. Tạo hóa đơn
     const invoice = await Invoice.create({
         examinationId,
         patientId: examination.patientId._id,
@@ -61,7 +93,6 @@ async function createInvoice({ examinationId, items }) {
         status: 'unpaid'
     });
 
-    // Populate để trả về đầy đủ thông tin
     const populatedInvoice = await Invoice.findById(invoice._id)
         .populate('examinationId')
         .populate('patientId', 'fullName phone cccd')

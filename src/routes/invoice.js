@@ -25,12 +25,12 @@ const { authenticate, authorize } = require('../middleware/auth');
  *             type: object
  *             required:
  *               - examinationId
- *               - items
  *             properties:
  *               examinationId:
  *                 type: string
  *               items:
  *                 type: array
+ *                 description: "Danh sách dịch vụ (Tùy chọn. Nếu trống, hệ thống tự động lấy từ ca khám và xét nghiệm)"
  *                 items:
  *                   type: object
  *                   properties:
