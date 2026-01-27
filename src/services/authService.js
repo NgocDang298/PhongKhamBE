@@ -737,6 +737,33 @@ module.exports = {
         try {
             const user = await findByCredentials(cccd, password);
             const token = await generateAuthToken(user);
+
+            // Fetch full name based on role
+            let fullName = '';
+            const userId = user._id;
+
+            switch (user.role) {
+                case 'patient':
+                    const patient = await Patient.findOne({ userId }).lean();
+                    fullName = patient ? patient.fullName : '';
+                    break;
+                case 'doctor':
+                    const doctor = await Doctor.findOne({ userId }).lean();
+                    fullName = doctor ? doctor.fullName : '';
+                    break;
+                case 'staff':
+                    const staff = await Staff.findOne({ userId }).lean();
+                    fullName = staff ? staff.fullName : '';
+                    break;
+                case 'lab_nurse':
+                    const nurse = await LabNurse.findOne({ userId }).lean();
+                    fullName = nurse ? nurse.fullName : '';
+                    break;
+                case 'admin':
+                    fullName = 'Administrator';
+                    break;
+            }
+
             return {
                 ok: true,
                 data: {
@@ -745,6 +772,7 @@ module.exports = {
                         _id: user._id,
                         cccd: user.cccd,
                         role: user.role,
+                        fullName: fullName
                     },
                     message: "Đăng nhập thành công"
                 }
