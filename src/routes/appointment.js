@@ -167,11 +167,6 @@ router.post('/appointments/:id/reject', authenticate, appointment.reject);
  *         required: true
  *         schema:
  *           type: string
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 5
  *     responses:
  *       200:
  *         description: Danh sách slots gợi ý
@@ -184,8 +179,6 @@ router.get('/appointments/:id/suggested-slots', authenticate, appointment.getSug
  *   get:
  *     summary: 2.8. Danh Sách Bác Sĩ
  *     tags: [Appointments]
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Danh sách bác sĩ
@@ -198,8 +191,6 @@ router.get('/appointments/doctors', authenticate, appointment.listDoctors);
  *   get:
  *     summary: 2.9. Ngày Trống Theo Bác Sĩ
  *     tags: [Appointments]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: doctorId
@@ -218,8 +209,6 @@ router.get('/appointments/doctors/available-dates', authenticate, appointment.ge
  *   get:
  *     summary: 2.10. Slots Trống Theo Bác Sĩ và Ngày
  *     tags: [Appointments]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: doctorId
@@ -244,8 +233,6 @@ router.get('/appointments/doctors/available-slots', authenticate, appointment.ge
  *   post:
  *     summary: 2.11. Tạo Lịch Hẹn Theo Bác Sĩ
  *     tags: [Appointments]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -263,8 +250,6 @@ router.get('/appointments/doctors/available-slots', authenticate, appointment.ge
  *                 format: date-time
  *               note:
  *                 type: string
- *               patientId:
- *                 type: string
  *     responses:
  *       200:
  *         description: Tạo lịch hẹn thành công
@@ -278,8 +263,6 @@ router.post('/appointments/doctors', authenticate, appointment.createAppointment
  *     summary: 2.12. Đặt Lịch Tự Động (Không Cần Chọn Bác Sĩ)
  *     description: Hệ thống sẽ tự động chọn bác sĩ có lịch làm việc, có slot trống và ít lịch hẹn nhất
  *     tags: [Appointments]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -293,7 +276,6 @@ router.post('/appointments/doctors', authenticate, appointment.createAppointment
  *                 type: string
  *                 format: date-time
  *                 example: 2024-12-17T09:00:00.000Z
- *                 description: Thời gian khám mong muốn
  *               note:
  *                 type: string
  *                 description: Ghi chú (optional)
@@ -331,15 +313,16 @@ router.post('/appointments/auto-assign', authenticate, appointment.createAppoint
  *               appointmentDate:
  *                 type: string
  *                 format: date-time
- *               note:
+ *               status:
  *                 type: string
- *               doctorId:
+ *                 enum: [pending, confirmed, cancelled]
+ *               note:
  *                 type: string
  *     responses:
  *       200:
  *         description: Cập nhật thành công
  *   delete:
- *     summary: Xóa Lịch Hẹn (Chỉ Pending)
+ *     summary: Xóa Lịch Hẹn
  *     tags: [Appointments]
  *     security:
  *       - bearerAuth: []

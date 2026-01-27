@@ -2,8 +2,8 @@ const router = require('express').Router();
 const examinationController = require('../controllers/examination');
 const { authenticate } = require('../middleware/auth');
 
-// Tất cả các route examination đều yêu cầu xác thực
-router.use('/api/examinations', authenticate);
+/// Tất cả các route examination đều yêu cầu xác thực
+router.use('/examinations', authenticate);
 
 /**
  * @swagger
@@ -14,7 +14,7 @@ router.use('/api/examinations', authenticate);
 
 /**
  * @swagger
- * /api/examinations/start:
+ * /examinations/start:
  *   post:
  *     summary: 5.1. Bắt Đầu Ca Khám
  *     description: |
@@ -71,11 +71,11 @@ router.use('/api/examinations', authenticate);
  *       500:
  *         description: Lỗi server
  */
-router.post('/api/examinations/start', examinationController.startExam);
+router.post('/examinations/start', examinationController.startExam);
 
 /**
  * @swagger
- * /api/examinations/appointment/{appointmentId}:
+ * /examinations/appointment/{appointmentId}:
  *   get:
  *     summary: 5.3. Lấy Ca Khám Theo Appointment
  *     tags: [Examinations]
@@ -91,11 +91,11 @@ router.post('/api/examinations/start', examinationController.startExam);
  *       200:
  *         description: Thông tin ca khám
  */
-router.get('/api/examinations/appointment/:appointmentId', examinationController.getExamByAppointment);
+router.get('/examinations/appointment/:appointmentId', examinationController.getExamByAppointment);
 
 /**
  * @swagger
- * /api/examinations/{id}:
+ * /examinations/{id}:
  *   get:
  *     summary: 5.2. Lấy Thông Tin Ca Khám
  *     tags: [Examinations]
@@ -139,12 +139,12 @@ router.get('/api/examinations/appointment/:appointmentId', examinationController
  *       200:
  *         description: Cập nhật thành công
  */
-router.get('/api/examinations/:id', examinationController.getExam);
-router.put('/api/examinations/:id', examinationController.updateExam);
+router.get('/examinations/:id', examinationController.getExam);
+router.put('/examinations/:id', examinationController.updateExam);
 
 /**
  * @swagger
- * /api/examinations:
+ * /examinations:
  *   get:
  *     summary: 5.4. Danh Sách Ca Khám
  *     tags: [Examinations]
@@ -178,11 +178,11 @@ router.put('/api/examinations/:id', examinationController.updateExam);
  *       200:
  *         description: Danh sách ca khám
  */
-router.get('/api/examinations', examinationController.listExams);
+router.get('/examinations', examinationController.listExams);
 
 /**
  * @swagger
- * /api/examinations/{id}/complete:
+ * /examinations/{id}/complete:
  *   put:
  *     summary: 5.6. Hoàn Thành Ca Khám
  *     tags: [Examinations]
@@ -212,11 +212,11 @@ router.get('/api/examinations', examinationController.listExams);
  *       200:
  *         description: Hoàn thành thành công
  */
-router.put('/api/examinations/:id/complete', examinationController.completeExam);
+router.put('/examinations/:id/complete', examinationController.completeExam);
 
 /**
  * @swagger
- * /api/examinations/{id}/follow-up:
+ * /examinations/{id}/follow-up:
  *   post:
  *     summary: Tạo lịch hẹn tái khám (Internal)
  *     tags: [Examinations]
@@ -232,11 +232,11 @@ router.put('/api/examinations/:id/complete', examinationController.completeExam)
  *       200:
  *         description: Created follow-up
  */
-router.post('/api/examinations/:id/follow-up', examinationController.createFollowUpAppointment);
+router.post('/examinations/:id/follow-up', examinationController.createFollowUpAppointment);
 
 /**
  * @swagger
- * /api/examinations/{id}:
+ * /examinations/{id}:
  *   delete:
  *     summary: Xóa Ca Khám (Chỉ Processing)
  *     tags: [Examinations]
@@ -252,6 +252,6 @@ router.post('/api/examinations/:id/follow-up', examinationController.createFollo
  *       200:
  *         description: Xóa thành công
  */
-router.delete('/api/examinations/:id', examinationController.deleteExam);
+router.delete('/examinations/:id', examinationController.deleteExam);
 
 module.exports = router;

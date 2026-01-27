@@ -4,15 +4,31 @@ module.exports = {
     /**
      * POST /test-results - Tạo kết quả xét nghiệm
      */
+    /**
+     * POST /test-results - Tạo kết quả xét nghiệm
+     */
     async create(req, res) {
-        const { testRequestId, resultData } = req.body;
+        let { testRequestId, resultData, labNurseId, images: bodyImages } = req.body;
 
-        // Lấy URLs từ Cloudinary (nếu có upload file)
-        const images = req.files ? req.files.map(file => file.path) : [];
+        // Lấy URLs từ Cloudinary (nếu có upload file qua multipart/form-data)
+        const uploadedImages = req.files ? req.files.map(file => file.path) : [];
+
+        // Kết hợp ảnh từ body (URLs) và ảnh upload (file)
+        let images = [];
+        if (Array.isArray(bodyImages)) {
+            images = [...bodyImages];
+        }
+        if (uploadedImages.length > 0) {
+            images = [...images, ...uploadedImages];
+        }
+
+        // Ưu tiên lấy labNurseId từ body (admin tạo cho nurse khác)
+        // Nếu không có trong body, lấy từ user đang đăng nhập
+        const nurseId = labNurseId || req.user.labNurseId || req.user._id;
 
         const result = await testResultService.createTestResult({
             testRequestId,
-            labNurseId: req.user.labNurseId || req.user._id,
+            labNurseId: nurseId,
             resultData: typeof resultData === 'string' ? JSON.parse(resultData) : resultData,
             images
         });

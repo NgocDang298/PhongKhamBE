@@ -65,7 +65,7 @@ const { authenticate, authorize } = require('../middleware/auth');
  *                 data:
  *                   type: object
  */
-router.post('/auth/register/patient', auth.registerPatient); // Bệnh nhân tự đăng ký
+router.post('/register/patient', auth.registerPatient); // Bệnh nhân tự đăng ký
 
 /**
  * @swagger
@@ -98,7 +98,7 @@ router.post('/auth/register/patient', auth.registerPatient); // Bệnh nhân t�
  *       200:
  *         description: Đăng ký admin thành công
  */
-router.post('/auth/register/admin', auth.registerAdmin); // Tạo admin (WARNING: Public endpoint - disable after first admin)
+router.post('/register/admin', auth.registerAdmin); // Tạo admin (WARNING: Public endpoint - disable after first admin)
 
 /**
  * @swagger
@@ -140,7 +140,7 @@ router.post('/auth/register/admin', auth.registerAdmin); // Tạo admin (WARNING
  *                   type: string
  *                   example: "Đăng nhập thành công"
  */
-router.post('/auth/login', auth.login);
+router.post('/login', auth.login);
 
 
 // Protected routes
@@ -197,7 +197,7 @@ router.post('/auth/login', auth.login);
  *       200:
  *         description: Tạo tài khoản thành công
  */
-router.post('/auth/register', authenticate, authorize(['admin']), auth.register); // Admin đăng ký cho staff/doctor/nurse
+router.post('/register', authenticate, authorize(['admin']), auth.register); // Admin đăng ký cho staff/doctor/nurse
 
 /**
  * @swagger
@@ -225,7 +225,7 @@ router.post('/auth/register', authenticate, authorize(['admin']), auth.register)
  *       200:
  *         description: Đổi mật khẩu thành công
  */
-router.put('/auth/change-password', authenticate, auth.changePassword);
+router.put('/change-password', authenticate, auth.changePassword);
 
 /**
  * @swagger
@@ -239,6 +239,6 @@ router.put('/auth/change-password', authenticate, auth.changePassword);
  *       200:
  *         description: Đăng xuất thành công
  */
-router.post('/auth/logout', authenticate, auth.logout);
+router.post('/logout', authenticate, auth.logout);
 
 module.exports = router;

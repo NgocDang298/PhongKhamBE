@@ -46,7 +46,9 @@ const { connectMongoose } = require('./models/mongoose');
 
 // Gán các route
 
-app.use('/', require('./routes/router.js'));
+app.use('/api/v1', require('./routes/router.js'));
+
+
 
 // Swagger UI
 const swaggerUi = require('swagger-ui-express');

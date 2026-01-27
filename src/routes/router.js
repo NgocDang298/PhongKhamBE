@@ -1,7 +1,10 @@
 const router = require('express').Router();
 
+// Các route kết quả xét nghiệm
+router.use(require('./testResult'));
+
 // Các route xác thực
-router.use(require('./auth'));
+router.use('/auth', require('./auth'));
 
 // Các route lịch hẹn
 router.use(require('./appointment'));
@@ -18,8 +21,7 @@ router.use(require('./examination'));
 // Các route yêu cầu xét nghiệm
 router.use(require('./testRequest'));
 
-// Các route kết quả xét nghiệm
-router.use(require('./testResult'));
+
 
 // Các route quản lý dịch vụ
 router.use(require('./service'));

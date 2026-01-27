@@ -10,7 +10,7 @@ const options = {
         },
         servers: [
             {
-                url: 'http://localhost:8000',
+                url: 'http://localhost:8000/api/v1',
                 description: 'Development server',
             },
         ],
