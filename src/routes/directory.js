@@ -83,8 +83,56 @@ router.get('/patients', authenticate, authorize(['admin', 'staff']), directory.l
  *     responses:
  *       200:
  *         description: Danh sách bác sĩ
+ * /doctors/{id}:
+ *   put:
+ *     summary: Cập Nhật Thông Tin Bác Sĩ
+ *     tags: [Directory]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Doctor ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               gender:
+ *                 type: string
+ *                 enum: [male, female, other]
+ *               dateOfBirth:
+ *                 type: string
+ *                 format: date
+ *               address:
+ *                 type: string
+ *               cccd:
+ *                 type: string
+ *               specialty:
+ *                 type: string
+ *               degree:
+ *                 type: string
+ *               birthYear:
+ *                 type: integer
+ *               workExperience:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Cập nhật thành công
  */
 router.get('/doctors', authenticate, authorize(['admin', 'staff']), directory.listDoctors);
+router.put('/doctors/:id', authenticate, authorize(['admin']), directory.updateDoctor);
 
 /**
  * @swagger
@@ -97,8 +145,48 @@ router.get('/doctors', authenticate, authorize(['admin', 'staff']), directory.li
  *     responses:
  *       200:
  *         description: Danh sách nhân viên
+ * /staffs/{id}:
+ *   put:
+ *     summary: Cập Nhật Thông Tin Nhân Viên
+ *     tags: [Directory]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Staff ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               gender:
+ *                 type: string
+ *                 enum: [male, female, other]
+ *               dateOfBirth:
+ *                 type: string
+ *                 format: date
+ *               address:
+ *                 type: string
+ *               cccd:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Cập nhật thành công
  */
 router.get('/staffs', authenticate, authorize(['admin', 'staff']), directory.listStaffs);
+router.put('/staffs/:id', authenticate, authorize(['admin']), directory.updateStaff);
 
 /**
  * @swagger
@@ -111,8 +199,48 @@ router.get('/staffs', authenticate, authorize(['admin', 'staff']), directory.lis
  *     responses:
  *       200:
  *         description: Danh sách y tá
+ * /nurses/{id}:
+ *   put:
+ *     summary: Cập Nhật Thông Tin Y Tá
+ *     tags: [Directory]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Nurse ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               gender:
+ *                 type: string
+ *                 enum: [male, female, other]
+ *               dateOfBirth:
+ *                 type: string
+ *                 format: date
+ *               address:
+ *                 type: string
+ *               cccd:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Cập nhật thành công
  */
 router.get('/nurses', authenticate, authorize(['admin', 'staff', 'doctor']), directory.listNurses);
+router.put('/nurses/:id', authenticate, authorize(['admin']), directory.updateNurse);
 
 /**
  * @swagger

@@ -19,6 +19,16 @@ const DoctorSchema = new mongoose.Schema({
     degree: {
         type: String
     },
+    gender: {
+        type: String,
+        enum: ['male', 'female', 'other']
+    },
+    dateOfBirth: {
+        type: Date
+    },
+    address: {
+        type: String
+    },
     // email đã được lưu trong User model
     birthYear: {
         type: Number

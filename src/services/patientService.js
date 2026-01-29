@@ -146,25 +146,72 @@ const patientService = {
      * @returns {Object} - { ok, code, message, data }
      */
     async updatePatient(patientId, updates) {
+        const { User } = require('../models');
         const patient = await Patient.findById(patientId);
         if (!patient) {
             return { ok: false, code: 404, message: 'Không tìm thấy bệnh nhân' };
         }
 
-        // Validate and update allowed fields
+        // 1. Cập nhật Patient profile
         const allowedFields = ['fullName', 'phone', 'address', 'gender', 'dateOfBirth', 'cccd', 'email'];
-
         for (const field of allowedFields) {
             if (updates[field] !== undefined) {
-                patient[field] = updates[field];
+                if (field === 'dateOfBirth' && updates[field] === '') {
+                    patient[field] = null;
+                } else {
+                    patient[field] = updates[field];
+                }
+            }
+        }
+
+        // 2. Đồng bộ với User model nếu có userId
+        let userUpdated = false;
+        if (patient.userId) {
+            const user = await User.findById(patient.userId);
+            if (user) {
+                // Email
+                if (updates.email !== undefined) {
+                    if (updates.email && updates.email !== user.email) {
+                        const existing = await User.findOne({ email: updates.email.toLowerCase(), _id: { $ne: user._id } });
+                        if (existing) return { ok: false, code: 409, message: 'Email đã được sử dụng' };
+                    }
+                    user.email = updates.email ? updates.email.toLowerCase() : undefined;
+                    userUpdated = true;
+                }
+
+                // Phone/SDT
+                const phoneInput = updates.phone || updates.sdt;
+                if (phoneInput !== undefined) {
+                    if (phoneInput && phoneInput !== user.sdt) {
+                        const existing = await User.findOne({ sdt: phoneInput, _id: { $ne: user._id } });
+                        if (existing) return { ok: false, code: 409, message: 'Số điện thoại đã được sử dụng' };
+                    }
+                    user.sdt = phoneInput || undefined;
+                    userUpdated = true;
+                }
+
+                // CCCD
+                if (updates.cccd !== undefined) {
+                    if (updates.cccd && updates.cccd !== user.cccd) {
+                        const existing = await User.findOne({ cccd: updates.cccd, _id: { $ne: user._id } });
+                        if (existing) return { ok: false, code: 409, message: 'CCCD đã được sử dụng' };
+                    }
+                    user.cccd = updates.cccd;
+                    userUpdated = true;
+                }
+
+                if (userUpdated) await user.save();
             }
         }
 
         await patient.save();
 
+        // Lấy lại data đầy đủ
+        const updatedData = await Patient.findById(patientId).populate('userId', '-password -tokens').lean();
+
         return {
             ok: true,
-            data: patient,
+            data: updatedData,
             message: 'Cập nhật thông tin bệnh nhân thành công'
         };
     },

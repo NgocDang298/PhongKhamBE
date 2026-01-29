@@ -64,6 +64,16 @@ module.exports = {
     },
 
     /**
+     * PUT /staffs/:id - Cập nhật thông tin nhân viên
+     */
+    async updateStaff(req, res) {
+        const staffUpdateService = require('../services/staffUpdateService');
+        const result = await staffUpdateService.updateStaff(req.params.id, req.body || {});
+        if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
+        return res.json({ status: true, message: result.message, data: result.data });
+    },
+
+    /**
      * DELETE /patients/:id - Xóa bệnh nhân (soft delete)
      */
     async deletePatient(req, res) {
@@ -71,6 +81,26 @@ module.exports = {
         const result = await patientService.deletePatient(req.params.id);
         if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
         return res.json({ status: true, message: result.message });
+    },
+
+    /**
+     * PUT /doctors/:id - Cập nhật thông tin bác sĩ
+     */
+    async updateDoctor(req, res) {
+        const doctorService = require('../services/doctorService');
+        const result = await doctorService.updateDoctor(req.params.id, req.body || {});
+        if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
+        return res.json({ status: true, message: result.message, data: result.data });
+    },
+
+    /**
+     * PUT /nurses/:id - Cập nhật thông tin y tá
+     */
+    async updateNurse(req, res) {
+        const nurseService = require('../services/nurseService');
+        const result = await nurseService.updateNurse(req.params.id, req.body || {});
+        if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
+        return res.json({ status: true, message: result.message, data: result.data });
     }
 };
 

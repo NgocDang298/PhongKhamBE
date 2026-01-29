@@ -12,6 +12,16 @@ const LabNurseSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    gender: {
+        type: String,
+        enum: ['male', 'female', 'other']
+    },
+    dateOfBirth: {
+        type: Date
+    },
+    address: {
+        type: String
+    },
     // email, phone, cccd đã được lưu trong User model
     dob: {
         type: Date
