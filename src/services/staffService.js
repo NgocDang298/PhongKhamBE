@@ -191,7 +191,7 @@ const staffService = {
         if (status) filter.status = status;
 
         const data = await Appointment.find(filter)
-            .sort({ appointmentDate: 1 })
+            .sort({ createdAt: -1 })
             .populate('patientId', 'fullName')
             .populate('doctorId', 'fullName')
             .populate('staffId', 'fullName')

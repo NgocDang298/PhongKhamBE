@@ -219,6 +219,6 @@ router.put(
  *         description: Xóa thành công
  */
 router.put('/invoices/:id', authenticate, authorize(['admin', 'staff']), invoiceController.updateInvoice);
-router.delete('/invoices/:id', authenticate, authorize(['admin']), invoiceController.deleteInvoice);
+router.delete('/invoices/:id', authenticate, authorize(['admin', 'staff']), invoiceController.deleteInvoice);
 
 module.exports = router;

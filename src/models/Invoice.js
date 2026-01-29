@@ -47,7 +47,8 @@ const InvoiceSchema = new mongoose.Schema({
         type: String,
         enum: [
             'unpaid',
-            'paid'
+            'paid',
+            'cancelled'
         ],
         default: 'unpaid',
         index: true

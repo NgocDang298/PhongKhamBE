@@ -100,6 +100,16 @@ async function listDoctors(req, res) {
     }
 }
 
+// danh sách chuyên khoa
+async function listSpecialties(req, res) {
+    try {
+        const specialties = await appointmentService.listSpecialties();
+        return res.json({ status: true, message: 'Lấy danh sách chuyên khoa thành công', data: specialties });
+    } catch (error) {
+        return res.status(500).json({ status: false, message: error.message });
+    }
+}
+
 // ngày trống theo bác sĩ
 async function getAvailableDatesByDoctor(req, res) {
     const { doctorId } = req.query;
@@ -114,10 +124,10 @@ async function getAvailableDatesByDoctor(req, res) {
 
 // slot trống theo bác sĩ + ngày
 async function getAvailableSlotsByDoctorAndDate(req, res) {
-    const { doctorId, date } = req.query;
-    if (!doctorId || !date) return res.status(400).json({ status: false, message: 'doctorId và date là bắt buộc' });
+    const { doctorId, date, specialty } = req.query;
+    if (!date) return res.status(400).json({ status: false, message: 'date là bắt buộc' });
     try {
-        const slots = await appointmentService.getAvailableSlotsByDoctorAndDate(doctorId, date);
+        const slots = await appointmentService.getAvailableSlotsByDoctorAndDate(doctorId, date, specialty);
         return res.json({ status: true, message: 'Lấy danh sách slot trống thành công', data: slots });
     } catch (error) {
         return res.status(500).json({ status: false, message: error.message });
@@ -164,7 +174,7 @@ async function createAppointmentByDoctor(req, res) {
 
 // tạo appointment tự động (không cần chọn bác sĩ)
 async function createAppointmentAutoAssign(req, res) {
-    const { appointmentDate, note } = req.body;
+    const { appointmentDate, note, specialty } = req.body;
 
     if (!appointmentDate) {
         return res.status(400).json({ status: false, message: 'appointmentDate là bắt buộc' });
@@ -193,7 +203,8 @@ async function createAppointmentAutoAssign(req, res) {
             doctorId: null, // Tự động chọn bác sĩ
             appointmentDate,
             note,
-            createdByRole: req.user.role
+            createdByRole: req.user.role,
+            specialty
         });
         if (!result.ok) return res.status(result.code || 400).json({ status: false, message: result.message });
         return res.json({
@@ -215,7 +226,7 @@ async function listDoctorAppointments(currentUser, query) {
     const filter = { doctorId: doctor._id };
     if (status) filter.status = status;
     const data = await Appointment.find(filter)
-        .sort({ appointmentDate: 1 })
+        .sort({ createdAt: -1 })
         .populate('patientId', 'fullName phone')
         .populate('doctorId', 'fullName specialty')
         .populate('staffId', 'fullName')
@@ -253,6 +264,7 @@ module.exports = {
     getSuggestedSlots,
     // chức năng bác sĩ mới
     listDoctors,
+    listSpecialties,
     getAvailableDatesByDoctor,
     getAvailableSlotsByDoctorAndDate,
     createAppointmentByDoctor,

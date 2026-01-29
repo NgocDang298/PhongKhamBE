@@ -187,6 +187,18 @@ router.get('/appointments/doctors', authenticate, appointment.listDoctors);
 
 /**
  * @swagger
+ * /appointments/specialties:
+ *   get:
+ *     summary: 2.13. Lấy Danh Sách Chuyên Khoa
+ *     tags: [Appointments]
+ *     responses:
+ *       200:
+ *         description: Danh sách chuyên khoa bác sĩ
+ */
+router.get('/appointments/specialties', authenticate, appointment.listSpecialties);
+
+/**
+ * @swagger
  * /appointments/doctors/available-dates:
  *   get:
  *     summary: 2.9. Ngày Trống Theo Bác Sĩ
@@ -271,11 +283,15 @@ router.post('/appointments/doctors', authenticate, appointment.createAppointment
  *             type: object
  *             required:
  *               - appointmentDate
+ *               - specialty
  *             properties:
  *               appointmentDate:
  *                 type: string
  *                 format: date-time
  *                 example: 2024-12-17T09:00:00.000Z
+ *               specialty:
+ *                 type: string
+ *                 example: Nội Khoa
  *               note:
  *                 type: string
  *                 description: Ghi chú (optional)

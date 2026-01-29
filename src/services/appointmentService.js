@@ -46,32 +46,63 @@ function getSlotsForShift(dateVN, shiftStart, shiftEnd) {
     return slots;
 }
 
-// --- Lấy slot trống theo bác sĩ & ngày ---
-async function getAvailableSlotsByDoctorAndDate(doctorId, dateStr) {
+// --- Lấy slot trống theo bác sĩ & ngày (hoặc chuyên khoa) ---
+async function getAvailableSlotsByDoctorAndDate(doctorId, dateStr, specialty) {
     const dateVN = createDateVN(dateStr);
-    const dayOfWeek = (dateVN.getUTCDay() + 6) % 7;
+    const dayOfWeek = dateVN.getUTCDay(); // 0 = Sunday, 1 = Monday...
 
-    const schedules = await WorkSchedule.find({ doctorId, dayOfWeek }).lean();
+    const filter = { dayOfWeek };
+    if (doctorId) {
+        filter.doctorId = doctorId;
+    } else if (specialty) {
+        // Nếu không có doctorId nhưng có chuyên khoa, tìm các bác sĩ thuộc chuyên khoa đó
+        const doctorsInSpecialty = await Doctor.find({ specialty, active: true }).select('_id').lean();
+        const ids = doctorsInSpecialty.map(d => d._id);
+        filter.doctorId = { $in: ids };
+    }
+
+    const schedules = await WorkSchedule.find(filter).lean();
     if (!schedules.length) return [];
 
     const nextDateVN = new Date(dateVN.getTime());
     nextDateVN.setUTCDate(dateVN.getUTCDate() + 1);
 
-    const appointments = await Appointment.find({
-        doctorId,
+    const apptFilter = {
         status: 'confirmed',
         appointmentDate: { $gte: dateVN, $lt: nextDateVN }
-    }).select('appointmentDate').lean();
+    };
+    if (doctorId) apptFilter.doctorId = doctorId;
+
+    const appointments = await Appointment.find(apptFilter).select('appointmentDate doctorId').lean();
 
     const slots = [];
+    const timeSet = new Set();
+
     for (const schedule of schedules) {
         const shiftSlots = getSlotsForShift(dateVN, schedule.shiftStart, schedule.shiftEnd);
         for (const slot of shiftSlots) {
-            if (!appointments.some(appt => hasTimeConflict(slot, new Date(appt.appointmentDate)))) {
-                slots.push({ time: formatSlotVN(slot), doctorId });
+            const timeStr = formatSlotVN(slot);
+
+            if (!appointments.some(appt =>
+                appt.doctorId.toString() === schedule.doctorId.toString() &&
+                hasTimeConflict(slot, new Date(appt.appointmentDate))
+            )) {
+                if (!doctorId) {
+                    // Trường hợp auto-assign (không truyền doctorId): Chỉ lấy unique time
+                    if (!timeSet.has(timeStr)) {
+                        slots.push({ time: timeStr });
+                        timeSet.add(timeStr);
+                    }
+                } else {
+                    // Trường hợp xem đích danh 1 bác sĩ: Lấy đủ time và doctorId
+                    slots.push({ time: timeStr, doctorId: schedule.doctorId });
+                }
             }
         }
     }
+
+    // Sắp xếp theo thứ tự thời gian tăng dần để FE hiển thị dễ nhìn
+    slots.sort((a, b) => a.time.localeCompare(b.time));
 
     return slots;
 }
@@ -85,7 +116,7 @@ async function getAvailableDatesByDoctor(doctorId, daysAhead = 30) {
         const dateVN = new Date(fromDate.getTime());
         dateVN.setUTCDate(fromDate.getUTCDate() + i);
 
-        const dayOfWeek = (dateVN.getUTCDay() + 6) % 7;
+        const dayOfWeek = dateVN.getUTCDay();
 
         const schedules = await WorkSchedule.find({ doctorId, dayOfWeek }).lean();
         if (!schedules.length) continue;
@@ -116,18 +147,21 @@ async function getAvailableDatesByDoctor(doctorId, daysAhead = 30) {
 
 // --- Tự động chọn bác sĩ phù hợp ---
 // Thuật toán: Tìm bác sĩ có lịch làm việc, có slot trống, và ít lịch hẹn nhất (load balancing)
-async function autoAssignDoctor(appointmentDate) {
+async function autoAssignDoctor(appointmentDate, specialty) {
     const slotUTC = new Date(appointmentDate);
-    
+
     // Lấy ngày và thứ trong tuần
     const dateVN = new Date(slotUTC.getTime());
     dateVN.setUTCHours(0, 0, 0, 0);
-    const dayOfWeek = (dateVN.getUTCDay() + 6) % 7;
+    const dayOfWeek = dateVN.getUTCDay(); // 0 = Sunday
 
-    // Tìm tất cả bác sĩ active
-    const activeDoctors = await Doctor.find({ active: true }).select('_id fullName specialty').lean();
+    // Tìm tất cả bác sĩ active theo chuyên khoa (nếu có)
+    const doctorFilter = { active: true };
+    if (specialty) doctorFilter.specialty = specialty;
+
+    const activeDoctors = await Doctor.find(doctorFilter).select('_id fullName specialty').lean();
     if (!activeDoctors.length) {
-        return { ok: false, message: 'Không có bác sĩ nào khả dụng', code: 404 };
+        return { ok: false, message: specialty ? `Không có bác sĩ chuyên khoa ${specialty} khả dụng` : 'Không có bác sĩ nào khả dụng', code: 404 };
     }
 
     // Lấy lịch làm việc của các bác sĩ trong ngày này
@@ -143,13 +177,13 @@ async function autoAssignDoctor(appointmentDate) {
 
     // Lọc bác sĩ có lịch làm việc
     const doctorsWithSchedule = schedules.map(s => s.doctorId.toString());
-    
+
     // Kiểm tra từng bác sĩ xem có slot trống không
     const availableDoctors = [];
-    
+
     for (const schedule of schedules) {
         const doctorId = schedule.doctorId;
-        
+
         // Kiểm tra xem slot này có bị conflict với appointment đã confirm không
         const conflict = await Appointment.findOne({
             doctorId,
@@ -163,10 +197,10 @@ async function autoAssignDoctor(appointmentDate) {
         // Kiểm tra xem thời gian có nằm trong ca làm việc không
         const [startH, startM] = schedule.shiftStart.split(':').map(Number);
         const [endH, endM] = schedule.shiftEnd.split(':').map(Number);
-        
+
         const shiftStartUTC = new Date(dateVN.getTime());
         shiftStartUTC.setUTCHours(startH - 7, startM, 0, 0);
-        
+
         const shiftEndUTC = new Date(dateVN.getTime());
         shiftEndUTC.setUTCHours(endH - 7, endM, 0, 0);
 
@@ -176,7 +210,7 @@ async function autoAssignDoctor(appointmentDate) {
             // Đếm số lịch hẹn confirmed của bác sĩ trong ngày
             const nextDateVN = new Date(dateVN.getTime());
             nextDateVN.setUTCDate(dateVN.getUTCDate() + 1);
-            
+
             const appointmentCount = await Appointment.countDocuments({
                 doctorId,
                 status: 'confirmed',
@@ -210,12 +244,12 @@ async function autoAssignDoctor(appointmentDate) {
 }
 
 // --- Tạo lịch hẹn theo bác sĩ ---
-async function createAppointmentForDoctor({ patientId, doctorId, appointmentDate, note, createdByRole }) {
+async function createAppointmentForDoctor({ patientId, doctorId, appointmentDate, note, createdByRole, specialty }) {
     const slotUTC = new Date(appointmentDate);
 
     // Nếu không có doctorId, tự động chọn bác sĩ
     if (!doctorId) {
-        const autoAssignResult = await autoAssignDoctor(appointmentDate);
+        const autoAssignResult = await autoAssignDoctor(appointmentDate, specialty);
         if (!autoAssignResult.ok) {
             return autoAssignResult;
         }
@@ -237,7 +271,7 @@ async function createAppointmentForDoctor({ patientId, doctorId, appointmentDate
 
     // Nếu patient tự tạo => status pending, nếu staff/admin tạo => confirmed
     const status = (createdByRole === 'patient') ? 'pending' : 'confirmed';
-    
+
     const newAppointment = await Appointment.create({
         patientId,
         doctorId,
@@ -404,11 +438,19 @@ async function deleteAppointment(appointmentId) {
     };
 }
 
+// --- Lấy danh sách chuyên khoa ---
+async function listSpecialties() {
+    const specialties = await Doctor.distinct('specialty', { active: true, specialty: { $ne: null } });
+    return specialties.sort();
+}
+
 module.exports = {
     getAvailableSlotsByDoctorAndDate,
+    getAvailableSlots: getAvailableSlotsByDoctorAndDate, // Alias for consistency
     getAvailableDatesByDoctor,
     createAppointmentForDoctor,
     listActiveDoctors,
+    listSpecialties,
     checkSlotAvailability,
     getSuggestedSlots,
     createAppointmentCore,
