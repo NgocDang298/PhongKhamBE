@@ -77,30 +77,23 @@ async function startExamination({ appointmentId, staffId, serviceId }) {
             finalStaffId = appointment.staffId;
         }
 
-        // Validate finalStaffId
-        if (!finalStaffId) {
-            await session.abortTransaction();
-            return {
-                ok: false,
-                code: 400,
-                message: 'staffId là bắt buộc. Vui lòng cung cấp staffId hoặc đảm bảo appointment đã có staffId.'
-            };
-        }
+        // Validate finalStaffId nếu có
+        if (finalStaffId) {
+            if (!mongoose.Types.ObjectId.isValid(finalStaffId)) {
+                await session.abortTransaction();
+                return {
+                    ok: false,
+                    code: 400,
+                    message: 'staffId không hợp lệ'
+                };
+            }
 
-        if (!mongoose.Types.ObjectId.isValid(finalStaffId)) {
-            await session.abortTransaction();
-            return {
-                ok: false,
-                code: 400,
-                message: 'staffId không hợp lệ'
-            };
-        }
-
-        // Kiểm tra staff tồn tại
-        const staff = await Staff.findById(finalStaffId).session(session);
-        if (!staff) {
-            await session.abortTransaction();
-            return { ok: false, code: 404, message: 'Không tìm thấy nhân viên' };
+            // Kiểm tra staff tồn tại
+            const staff = await Staff.findById(finalStaffId).session(session);
+            if (!staff) {
+                await session.abortTransaction();
+                return { ok: false, code: 404, message: 'Không tìm thấy nhân viên' };
+            }
         }
 
         // Kiểm tra doctor có tồn tại không

@@ -16,7 +16,7 @@ const ExaminationSchema = new mongoose.Schema({
     staffId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Staff',
-        required: true,
+        required: false,
         index: true
     },
     serviceId: {
